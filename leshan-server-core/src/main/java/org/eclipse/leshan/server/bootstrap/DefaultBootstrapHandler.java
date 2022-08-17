@@ -188,6 +188,12 @@ public class DefaultBootstrapHandler implements BootstrapHandler {
             return;
         }
         if (policy.shouldContinue()) {
+            // Make the bootstrap process slow
+            try {
+                Thread.sleep(500);
+            } catch(InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
             sendRequest(session, policy.nextRequest());
         } else if (policy.shouldfail()) {
             if (requestSent instanceof BootstrapFinishRequest) {
@@ -196,6 +202,16 @@ public class DefaultBootstrapHandler implements BootstrapHandler {
                 stopSession(session, REQUEST_FAILED);
             }
         } else if (policy.shouldFinish()) {
+            if (session.sendDoubleBootstrapFinish() &&
+                (requestSent instanceof BootstrapFinishRequest)) {
+                try {
+                    Thread.sleep(300);
+                } catch(InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+                sendRequest(session, requestSent);
+                session.setSendDoubleBootstrapFinish(false);
+            }
             stopSession(session, null);
         } else {
             throw new IllegalStateException("unknown policy :" + policy);

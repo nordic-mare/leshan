@@ -45,6 +45,8 @@ public class DefaultBootstrapSession implements BootstrapSession {
     private volatile boolean moreTasks = false;
     private volatile boolean cancelled = false;
 
+    private boolean sendDoubleBootstrapFinish = true;
+
     /**
      * Create a {@link DefaultBootstrapSession} using default client preferred content format (see
      * {@link BootstrapRequest#getPreferredContentFormat()} or {@link ContentFormat#TLV} content format if there is no
@@ -155,6 +157,16 @@ public class DefaultBootstrapSession implements BootstrapSession {
 
     public void setResponses(List<LwM2mResponse> responses) {
         this.responses = responses;
+    }
+
+    @Override
+    public void setSendDoubleBootstrapFinish(boolean sendDoubleBootstrapFinish) {
+        this.sendDoubleBootstrapFinish = sendDoubleBootstrapFinish;
+    }
+
+    @Override
+    public boolean sendDoubleBootstrapFinish() {
+        return sendDoubleBootstrapFinish;
     }
 
     @Override

@@ -45,6 +45,8 @@ public class BootstrapResource extends LwM2mCoapResource {
 
     private final BootstrapHandler bootstrapHandler;
 
+    private static boolean sendBootstrapAck = false;
+
     public BootstrapResource(BootstrapHandler handler) {
         super("bs");
         bootstrapHandler = handler;
@@ -93,11 +95,16 @@ public class BootstrapResource extends LwM2mCoapResource {
         Request coapRequest = exchange.advanced().getRequest();
         SendableResponse<BootstrapResponse> sendableResponse = bootstrapHandler.bootstrap(clientIdentity,
                 new BootstrapRequest(endpoint, preferredContentFomart, additionalParams, coapRequest));
-        BootstrapResponse response = sendableResponse.getResponse();
-        if (response.isSuccess()) {
-            exchange.respond(toCoapResponseCode(response.getCode()));
+        if (sendBootstrapAck) {
+            BootstrapResponse response = sendableResponse.getResponse();
+            if (response.isSuccess()) {
+                exchange.respond(toCoapResponseCode(response.getCode()));
+            } else {
+                exchange.respond(toCoapResponseCode(response.getCode()), response.getErrorMessage());
+            }
+            sendBootstrapAck = false;
         } else {
-            exchange.respond(toCoapResponseCode(response.getCode()), response.getErrorMessage());
+            sendBootstrapAck = true;
         }
         sendableResponse.sent();
     }

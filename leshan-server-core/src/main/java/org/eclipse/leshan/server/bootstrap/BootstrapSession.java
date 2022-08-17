@@ -64,6 +64,9 @@ public interface BootstrapSession {
      */
     long getCreationTime();
 
+    void setSendDoubleBootstrapFinish(boolean sendDoubleBootstrapFinish);
+    boolean sendDoubleBootstrapFinish();
+
     /**
      * Cancel the current session
      */
